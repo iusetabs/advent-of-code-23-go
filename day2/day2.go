@@ -28,6 +28,20 @@ func isColorBelowMax(color string, line string, max int) bool {
 	return true
 }
 
+func getMaxOfColor(color string, line string) int {
+	var maxi = -1
+	colorPattern, _ := regexp.Compile(`(\d+) ` + color)
+	number, _ := regexp.Compile(`\d+`)
+	cubesWithColor := colorPattern.FindAllString(line, -1)
+	for _, cubeWithColor := range cubesWithColor {
+		n, _ := strconv.Atoi(number.FindString(cubeWithColor))
+		if maxi == -1 || n > maxi {
+			maxi = n
+		}
+	}
+	return maxi
+}
+
 func main() {
 	file, err := os.Open("./day2/input.txt")
 	if err != nil {
@@ -35,7 +49,7 @@ func main() {
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
-	var p1 = 0
+	var p1, p2 = 0, 0
 
 parseCubes:
 	for scanner.Scan() {
@@ -47,7 +61,11 @@ parseCubes:
 			if isGamePossible(line) {
 				p1 += gameId
 			}
+			power := getMaxOfColor("red", line) * getMaxOfColor("green", line) * getMaxOfColor("blue", line)
+			p2 += power
 		}
 	}
-	fmt.Printf("%s%v", "Sum of IDs p1: ", p1)
+	fmt.Printf("%s%v\n", "Sum of IDs: ", p1)
+	fmt.Printf("%s%v\n", "Sum of the min powers is: ", p2)
+
 }
